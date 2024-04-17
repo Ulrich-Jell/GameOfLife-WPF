@@ -1,0 +1,65 @@
+﻿<Window x:Class="ConwaysGameOfLife.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ConwaysGameOfLife"
+        xmlns:prism="http://prismlibrary.com/"
+        xmlns:uc="clr-namespace:ConwaysGameOfLife.UserControls" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        prism:ViewModelLocator.AutoWireViewModel="False"
+        mc:Ignorable="d"
+        Title="Conway's Game Of Life - WPF Edition" SizeToContent="WidthAndHeight">
+
+    <Window.Resources>
+        <Style TargetType="Button" x:Key="NoGrid">
+            <Setter Property="IsEnabled" Value="{Binding ButtonsEnabled}" />
+            <Setter Property="Margin" Value="0,0,0,5"/>            
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="IsEnabled" Value="{Binding ButtonsEnabled}" />
+            <Setter Property="Width" Value="25"/>
+            <Setter Property="Margin" Value="5 0 0 0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    
+    
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="111"/>
+            <ColumnDefinition Width="{Binding Width}"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,5,0">
+            <Button Content="Start/Stop" Command="{Binding TriggerCommand}" Margin="0,0,0,5" IsEnabled="True" />
+            <Button Content="Clear Grid" Command="{Binding ClearGridCommand}" Style="{StaticResource NoGrid}" />
+            <StackPanel>
+                <TextBlock Text="Current Generation:"/>
+                <TextBlock Text="{Binding Generation}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Rows:"/>
+                <TextBox Text="{Binding Rows, Mode=TwoWay}"/>
+            </StackPanel>
+            <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                <TextBlock Text="Columns:"/>
+                <TextBox Text="{Binding Columns, Mode=TwoWay}" IsEnabled="{Binding ButtonsEnabled}"/>
+            </StackPanel>
+            <Button Content="Randomize" Command="{Binding RandomCommand}" Style="{StaticResource NoGrid}"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1">
+            <ItemsControl x:Name="itemsControl" ItemsSource="{Binding Cells}" BorderThickness="1" BorderBrush="Black" Height="{Binding Hight}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid  Columns="{Binding Columns}" Rows="{Binding Rows}" IsHitTestVisible="{Binding ButtonsEnabled}"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Background="{Binding Status}" Width="20" Height="20" 
+                                Command="{Binding ElementName=itemsControl,  Path=DataContext.ToggleStatusCommand}" CommandParameter="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>        
+    </Grid>
+</Window>
