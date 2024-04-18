@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ConwaysGameOfLife"
         xmlns:prism="http://prismlibrary.com/"
-        xmlns:uc="clr-namespace:ConwaysGameOfLife.UserControls" xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         prism:ViewModelLocator.AutoWireViewModel="False"
         mc:Ignorable="d"
         Title="Conway's Game Of Life - WPF Edition" SizeToContent="WidthAndHeight">
@@ -46,6 +45,7 @@
             </StackPanel>
             <Button Content="Randomize" Command="{Binding RandomCommand}" Style="{StaticResource NoGrid}"/>
         </StackPanel>
+        
         <StackPanel Grid.Column="1">
             <ItemsControl x:Name="itemsControl" ItemsSource="{Binding Cells}" BorderThickness="1" BorderBrush="Black" Height="{Binding Hight}">
                 <ItemsControl.ItemsPanel>

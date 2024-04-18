@@ -19,17 +19,22 @@ namespace ConwaysGameOfLife
     public class MainWindowViewModel : BindableBase
     {
 
-        
+        private int _lastRows;
+        private int _lastColumns;
+        private string _currentGen;
+        private string _lastGen;
+        private string _secondLastGen;
         public MainWindowViewModel()
         {
-            ColorString = new ObservableCollection<string>();
-            ColorTuple = new ObservableCollection<(string, int)>();
+            
             Cells = new ObservableCollection<CellDto>();
             Generation = 0;
             ButtonsEnabled = true;
             
             Rows = 15;
             Columns = 15;
+            _lastRows = 15;
+            _lastColumns = 15;
             Width = Columns * 20;
             Height = Rows * 20;
             Grid = new GridOfLife(Rows, Columns);
@@ -85,21 +90,6 @@ namespace ConwaysGameOfLife
             set { SetProperty(ref _grid, value); }
         }
 
-
-        private ObservableCollection<string> _colorString;
-        public ObservableCollection<string> ColorString
-        {
-            get { return _colorString; }
-            set { SetProperty(ref _colorString, value); }
-        }
-
-        private ObservableCollection<(string, int)> _colorTuple;
-        public ObservableCollection<(string, int)> ColorTuple
-        {
-            get { return _colorTuple; }
-            set { _colorTuple = value; }
-        }
-
         private ObservableCollection<CellDto> _cells;
         public ObservableCollection<CellDto> Cells
         {
@@ -150,10 +140,10 @@ namespace ConwaysGameOfLife
             int index = cell.Row * Columns + cell.Column;
             Cells[index].Status = status;
 
-            TransformGrid();
+            ReloadGrid();
         }
 
-        public void TransformGrid()
+        public void ReloadGrid()
         {
             Cells.Clear();
             for (int row = 0; row < Grid.Rows; row++)
@@ -173,32 +163,51 @@ namespace ConwaysGameOfLife
 
         public void AdjustGrid()
         {
-            Width = Columns * 20;
-            Height= Rows * 20;
-            Grid = new GridOfLife(Rows, Columns);
-
-            var livingCells = Cells.Where(x => x.Status == "black").ToList();
-            foreach (var cell in livingCells)
+            if (Columns > 50 || Rows > 50)
             {
-                Grid.ToggleCellStatus(cell.Row, cell.Column);
+                Rows = _lastRows;
+                Columns = _lastColumns;
+                MessageBox.Show("The maximum of rows and coluimns is 50 each.");
             }
+            else
+            {
+                Width = Columns * 20;
+                Height = Rows * 20;
+                Grid = new GridOfLife(Rows, Columns);
 
-            TransformGrid();
+                var livingCells = Cells.Where(x => x.Status == "black").ToList();
+
+
+                foreach (var cell in livingCells)
+                {
+                    if (cell.Row < Rows && cell.Column < Columns)
+                        Grid.ToggleCellStatus(cell.Row, cell.Column);
+                }
+
+                ReloadGrid();
+            }
         }
 
         private void dispatcherTimer_Tick(object? sender, EventArgs e)
         {
-            TransformGrid();
+            
             Generation++;
-
-            if (!Grid.CalculateGrowth())
+            if (!LifeIsEvolving())
             {
                 _dispatcherTimer.Stop();
-                MessageBox.Show($"All Dead after {Generation} generations !");
+                MessageBox.Show($"After {Generation} generations nothing new will happen!");
                 ClearGrid();
                 ButtonsEnabled = true;
             }
-            
+            else if (!Grid.CalculateGrowth())
+            {
+                _dispatcherTimer.Stop();
+                MessageBox.Show($"All Dead after {Generation} generations!");
+                ClearGrid();
+                ButtonsEnabled = true;
+            }
+            else
+                ReloadGrid();
         }
 
         private void ClearGrid()
@@ -206,21 +215,41 @@ namespace ConwaysGameOfLife
             Grid = new GridOfLife(Rows, Columns);
             Grid.PopulateGrid();
             Generation = 0;
-            TransformGrid();
+            ReloadGrid();
         }
 
         public void RandomizeCells()
         {
+            ClearGrid();
             for (int i = 0; i < Rows; i++)
             {
                 for (int j = 0; j < Columns; j++)
                 {
                     var r = new Random();
-                    if (r.Next(2) == 1)
+                    if (r.Next(4) == 1)
                         Grid.ToggleCellStatus(i, j);
                 }
             }
-            TransformGrid();
+            ReloadGrid();
+        }
+
+        private bool LifeIsEvolving()
+        {
+            _secondLastGen = _lastGen;
+            _lastGen = _currentGen;
+            _currentGen = "";
+            foreach (var cell in Cells)
+            {
+                if (cell.Status == "black")
+                    _currentGen += "1";
+                else
+                    _currentGen += "0";
+            }
+
+            if (_currentGen == _lastGen || _currentGen == _secondLastGen)
+                return false;
+            else
+                return true;
         }
 
     }

@@ -32,18 +32,6 @@ namespace ConwaysGameOfLife.Classes
             }
         }
 
-        public void PrintGrid()
-        {
-            foreach (var row in Cells)
-            {
-                var rowstring = "";
-                foreach (var cell in row)
-                    rowstring += cell.Status.ToString();
-                Console.WriteLine(rowstring);
-            }
-            Console.WriteLine();
-        }
-
         public bool CalculateGrowth()
         {
             var temp = new List<List<int>>();
@@ -88,30 +76,10 @@ namespace ConwaysGameOfLife.Classes
                         Cells[row][cell].Status = growth[row][cell];
                     }
                 }
-                //PrintGrid();
                 return true;
             }
             else
                 return false;
-        }
-
-        public void PrintNeighbours()
-        {
-            var temp = new List<List<CellOfLife>>(Cells);
-
-            foreach (var row in Cells)
-            {
-                string rowstring = string.Empty;
-                foreach (var cell in row)
-                {
-                    int n = cell.GetNeighboursValue(temp);
-                    rowstring += n.ToString();
-                }
-                Console.WriteLine(rowstring);
-
-            }
-            Console.WriteLine();
-
         }
 
         public void ToggleCellStatus(int row, int column)

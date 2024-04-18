@@ -1,4 +1,0 @@
-- Eingaben von Reihen und Spalten filtern/begrenzen
-- Scrollbar
-- verhalten wenn Spalten oder Reihen mit lebenden Zellen gekürzt werden
-- Code aufräumen
